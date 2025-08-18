@@ -1,0 +1,15 @@
+---
+authors:
+  - {{ author_fullname}} (https://github.com/{{ author_github_id }})
+dependencies: []
+description: An Ansible collection to ...
+documentation: https://github.com/{{ author_github_id }}/path_to_collection_repo/tree/master/docs
+homepage: https://github.com/{{ author_github_id }}/path_to_collection_repo
+issues: https://github.com/{{ author_github_id }}/path_to_collection_repo/issues
+license_file: LICENSE.md
+name: {{ collection_name }}
+namespace: {{ namespace }}
+readme: README.md
+repository: https://github.com/{{ author_github_id }}/path_to_collection_repo
+tags: []
+version: {{ lookup('pipe', 'date +%Y.%m') }}

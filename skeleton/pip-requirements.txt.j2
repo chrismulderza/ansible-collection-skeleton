@@ -1,0 +1,21 @@
+# Requirements file for pip
+#
+# Usage:
+#
+#   WORKWITHENV=$HOME/venv/ansible
+#   python3 -m venv $WORKWITHENV
+#   source $WORKWITHENV/bin/activate
+#   python3 -m pip install --upgrade pip
+#   python3 -m pip install --requirement pip-requirements.txt
+
+# Ansible 
+
+ansible >= 10.0.0
+netaddr
+
+# Used in Makefile
+
+pyyaml
+ansible-lint
+flake8
+yamllint
