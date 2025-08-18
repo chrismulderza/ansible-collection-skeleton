@@ -15,8 +15,8 @@ build/
 **/*.retry
 **/~ansible
 
-# Ignore generated files
-build/
+# Ignore debug files
+debug/
 
 # Ignore cached files, e.g. roles and collections from Ansible Galaxy
 .cache/
