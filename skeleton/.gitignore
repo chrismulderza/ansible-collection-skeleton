@@ -1,0 +1,40 @@
+#  vim:set filetype=gitignore tabstop=2 shiftwidth=2 expandtab:
+# 
+# .gitignore for collection bitbuild.homelab_infra
+# 
+# Ignore private user config
+ansible.cfg
+
+# Ignore vault passwords file
+.vault_pass.txt
+
+# Ingnore the build output directory
+build/
+
+# Ignore auto-created Ansible files and folders
+**/*.retry
+**/~ansible
+
+# Ignore generated files
+build/
+
+# Ignore cached files, e.g. roles and collections from Ansible Galaxy
+.cache/
+
+# Ignore pipenv's virtualenv
+.venv/
+
+# Ignore pipenv's Pipfile and Pipfile.lock because they will be generated from pip-requirements.txt
+Pipfile
+Pipfile.*
+
+# Ignore SSH known hosts
+.ssh_known_hosts
+.ssh_known_hosts.*
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[codz]
+*$py.class
+
+!.gitignore
