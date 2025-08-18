@@ -1,4 +1,4 @@
-# vim:set syntax=make tabstop=2 shiftwidth=2 expandtab:
+# vim:set syntax=make tabstop=2 shiftwidth=2 noexpandtab:
 
 # Defaults
 read_yaml_key = $(shell python3 -c "import yaml; print(yaml.load(open('$(1)'), Loader=yaml.BaseLoader)['$(2)'])")
@@ -16,26 +16,26 @@ COLLECTION_ROLES := $(shell cd roles && ls -1)
 
 # Targets
 
-all: clean lint build-collection
+all: clean lint build-collection install-collection
 .PHONY: all
 
-$(CLTN_DIR)/$(CLTN_FILE):
-	@build_dir=$$(readlink -f $(CLTN_DIR) ); \
+$(COLLECTION_DIR)/$(COLLECTION_FILE):
+	@build_dir=$$(readlink -f $(COLLECTION_DIR) ); \
 	[ ! -d .cache/build/ ] || rm -rf .cache/build/ && \
 	mkdir -p .cache/build && \
-	git archive master | tar -x -C .cache/build/ && \
+	git archive main | tar -x -C .cache/build/ && \
 	cd .cache/build/ && \
 	ansible-galaxy collection build --output-path "$$build_dir"
 # Build in a clean subdir without any ignored files and directories is required because Ansible Galaxy prior to 2.10
 # does not support the 'build_ignore' flag in the collection metadata file 'galaxy.yml'.
 # Ref.: https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html
 
-build-collection: $(CLTN_DIR)/$(CLTN_FILE)
+build-collection: $(COLLECTION_DIR)/$(COLLECTION_FILE)
 .PHONY: build-collection
 
 help-modules:
-ifneq ($(CLTN_MODULES),)
-	@ansible-doc --type module $(addprefix "$(CLTN_NAMESPACE).$(CLTN_NAME).",$(CLTN_MODULES))
+ifneq ($(COLLECTION_MODULES),)
+	@ansible-doc --type module $(addprefix "$(COLLECTION_NAMESPACE).$(COLLECTION_NAME).",$(COLLECTION_MODULES))
 endif
 .PHONY: help-modules
 
@@ -57,10 +57,10 @@ lint: lint-ansible-lint lint-flake8 lint-yamllint
 #       https://github.com/ansible/galaxy/blob/master/galaxy/importer/linters/__init__.py
 
 lint-ansible-lint: # lint roles
-ifneq ($(CLTN_ROLES),)
+ifneq ($(COLLECTION_ROLES),)
 	@ansible-lint --offline \
 		-p \
-		$(addprefix "roles/",$(CLTN_ROLES)) \
+		$(addprefix "roles/",$(COLLECTION_ROLES)) \
 		|| { [ "$?" = 2 ] && true; }
 # ansible-lint exit code 1 is app exception, 0 is no linter err, 2 is linter err
 endif
@@ -73,21 +73,38 @@ lint-flake8: # lint modules, module_utils, plugins and roles
 .PHONY: lint-flake8
 
 lint-yamllint: # lint apbs und roles
-ifneq ($(CLTN_ROLES),)
+ifneq ($(COLLECTION_ROLES),)
 	@yamllint \
 		-f parsable \
 		-c '.yamllint.yml' \
 		-- \
-		$(addprefix "roles/",$(CLTN_ROLES))
+		$(addprefix "roles/",$(COLLECTION_ROLES))
 endif
 .PHONY: lint-yamllint
 
+install-collection:
+	@ansible-galaxy collection install --force --offline $(COLLECTION_DIR)/$(COLLECTION_FILE)
+.PHONY: install-collection
+
+install: install-collection
+.PHONY: install
+
 publish-collection:
-	@ansible-galaxy collection publish $(CLTN_DIR)/$(CLTN_FILE)
+	@ansible-galaxy collection publish $(COLLECTION_DIR)/$(COLLECTION_FILE)
 .PHONY: publish-collection
 
 clean:
+	@rm $(COLLECTION_DIR)/$(COLLECTION_FILE)
+	@rm -rf .cache/build/*
 .PHONY: clean
+
+help:
+	@echo "Namespace: $(COLLECTION_NAMESPACE)"
+	@echo "Name $(COLLECTION_NAME)"
+	@echo "Version: $(COLLECTION_VERSION)"
+	@echo "Archive: $(COLLECTION_FILE)"
+	@echo "Build dir: $(COLLECTION_DIR)"
+.PHONY: help
 
 test:
 .PHONY: test
